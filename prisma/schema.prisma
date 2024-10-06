@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  displayName  String?   @default("noname")
+  bio          String?
+  avatarUrl    String?   @default("/uploads/no-user-image.png")
+  lastLogin    DateTime?
+  status       String    @default("offline")
+
+  createdChats Chat[]
+  chats        UserChat[]
+  messages     Message[]
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chatName String
+  isGroup  Boolean @default(false)
+
+  creatorId Int
+  user      User       @relation(fields: [creatorId], references: [id])
+  users     UserChat[]
+  messages  Message[]
+}
+
+model UserChat {
+  User       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  Chat       Chat     @relation(fields: [chatId], references: [id])
+  chatId     Int
+  assignedAt DateTime @default(now())
+
+  @@id([userId, chatId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+  isRead  Boolean @default(false)
+
+  chatId     Int
+  chat       Chat         @relation(fields: [chatId], references: [id])
+  userId     Int
+  user       User         @relation(fields: [userId], references: [id])
+  Attachment Attachment[]
+}
+
+model Attachment {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  uploadedAt DateTime @default(now())
+
+  fileUrl  String
+  fileType String
+
+  messageId Int
+  message   Message @relation(fields: [messageId], references: [id])
+}
