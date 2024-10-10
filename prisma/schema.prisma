@@ -31,8 +31,9 @@ model Chat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chatName String
-  isGroup  Boolean @default(false)
+  chatName  String?
+  isGroup   Boolean @default(false)
+  isDeleted Boolean @default(false)
 
   creatorId Int
   user      User       @relation(fields: [creatorId], references: [id])

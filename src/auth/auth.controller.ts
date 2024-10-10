@@ -1,17 +1,17 @@
 import {
   Body,
-  Controller, Get,
+  Controller,
   HttpCode,
   Post,
   Req,
   Res,
-  UnauthorizedException, UseGuards,
+  UnauthorizedException,
   UsePipes,
   ValidationPipe
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { Response, Request } from "express";
-import { AuthGuard } from "@nestjs/passport";
+
+import { Request, Response } from "express";
 import { AuthDto } from "../user/dto/user.dto";
 
 @Controller("auth")
@@ -63,12 +63,12 @@ export class AuthController {
     return true;
   }
 
-  //Авторизация через google
+  // //Авторизация через google
   // @Get("google")
   // @UseGuards(AuthGuard("google"))
   // async googleAuth(@Req() _req) {
   // }
-  //
+
   // //Переадресация после авторизации в google
   // @Get("google/callback")
   // @UseGuards(AuthGuard("google"))
@@ -84,4 +84,23 @@ export class AuthController {
   // }
 
 
+  // //Авторизация через yandex
+  // @Get("yandex")
+  // @UseGuards(AuthGuard("yandex"))
+  // async yandexAuth(@Req() _req) {
+  // }
+  //
+  // //Переадресация после авторизации в yandex
+  // @Get("yandex/callback")
+  // @UseGuards(AuthGuard("yandex"))
+  // async yandexAuthCallback(
+  //   @Req() req,
+  //   @Res({ passthrough: true }) res: Response
+  // ) {
+  //   const { refreshToken, ...response } =
+  //     await this.authService.validateOAuthLogin(req);
+  //   this.authService.addRefreshTokenToResponse(res, refreshToken);
+  //   return res.redirect(`${process.env['CLIENT_URL']}/dashboard?accessToken=${response.accessToken}`
+  //   );
+  // }
 }
