@@ -28,8 +28,9 @@ export class ChatController {
   }
 
   @Auth()
-  @Get("by-id/:id")
-  async getById(@Param("id") id: string, @CurrentUser("id") userId: number) {
+  @Get("by-id/:chatId")
+  async getById(@Param("chatId") id: string,
+                @CurrentUser("id") userId: number) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.chatService.getChatById(chatId, userId);
   }
@@ -44,8 +45,8 @@ export class ChatController {
   @HttpCode(200)
   @Auth()
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
-  @Patch(":id/delete")
-  async delete(@Param("id") id: string, @CurrentUser("id") userId: number) {
+  @Patch(":chatId/delete")
+  async delete(@Param("chatId") id: string, @CurrentUser("id") userId: number) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.chatService.delete(chatId, userId);
   }
@@ -72,9 +73,9 @@ export class ChatController {
   @HttpCode(200)
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
-  @Put(":id")
+  @Put(":chatId")
   async update(
-    @Param("id") id: string,
+    @Param("chatId") id: string,
     @Body() dto: UpdateChatDto,
     @CurrentUser("id") userId: number)
  {
@@ -86,9 +87,9 @@ export class ChatController {
   @HttpCode(200)
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
-  @Patch(":id/add")
+  @Patch(":chatId/add")
   async addUserToChat(
-    @Param("id") id: string,
+    @Param("chatId") id: string,
     @Body() dto: IdUsersChatDto
   ) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
@@ -99,9 +100,9 @@ export class ChatController {
   @HttpCode(200)
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
-  @Patch(":id/remove")
+  @Patch(":chatId/remove")
   async removeUserToChat(
-    @Param("id") id: string,
+    @Param("chatId") id: string,
     @Body() dto: IdUsersChatDto,
     @CurrentUser("id") creatorId: number,
   ) {

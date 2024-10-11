@@ -11,7 +11,7 @@ import { MessageModule } from './message/message.module';
 @Module({
   imports: [ConfigModule.forRoot(), AuthModule, UserModule, ChatModule, MessageModule], // чтобы удобнее работать с переменными окружения ENVIRONMENT VARIABLES
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService, ChatModule, MessageModule, ]
 })
 export class AppModule {
 }

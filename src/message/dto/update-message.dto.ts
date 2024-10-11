@@ -1,6 +1,6 @@
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
-export class CreateMessageDto {
+export class UpdateMessageDto {
   @IsNotEmpty()
   @IsString()
   content: string; // Текст сообщения
@@ -9,5 +9,5 @@ export class CreateMessageDto {
   userId: number; //  ID пользователя
 
   @IsInt()
-  chatId: number; //  ID чата
+  messageId: number; //  ID чата
 }

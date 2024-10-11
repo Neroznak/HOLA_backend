@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Test</title>
+</head>
+<body>
+<h1>WebSocket Test</h1>
+<script>
+  // Замените URL на ваш WebSocket URL
+  const socket = new WebSocket('ws://localhost:5036/messages');
+
+  // Событие, которое срабатывает при открытии соединения
+  socket.onopen = () => {
+    console.log('WebSocket connected');
+    // Пример отправки сообщения
+    socket.send(JSON.stringify({ message: 'Hello Server!' }));
+  };
+
+  // Событие, которое срабатывает при получении сообщения
+  socket.onmessage = (event) => {
+    console.log('Message from server:', event.data);
+  };
+
+  // Событие, которое срабатывает при ошибке
+  socket.onerror = (error) => {
+    console.error('WebSocket error:', error);
+  };
+
+  // Событие, которое срабатывает при закрытии соединения
+  socket.onclose = () => {
+    console.log('WebSocket closed');
+  };
+</script>
+</body>
+</html>
