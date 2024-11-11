@@ -8,7 +8,8 @@ async function bootstrap() {
   app.use(cookieParser()); // для работы с cookie
   // app.setGlobalPrefix("api");
   app.enableCors({ // Cross-Origin Resource Sharing , для подключения к frontend'у
-    origin: [process.env.CLIENT_URL], // указываю какие URL могут делать запросу к backend'у
+    origin: "*", // указываю какие URL могут делать запросу к backend'у
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // разрешаю отправлять куки при запросах с фронтэнда
     exposedHeaders: "set-cookie" // чтобы фронтэнд мог читать ответы через куки от сервера
   });

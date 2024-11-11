@@ -62,28 +62,28 @@ export class GroupService extends ChatService {
     });
   }
 
-  async addUserToGroupChat(chatId: number, userId: number) {
+  async addUserToGroupChat(chatId: number, userIds: number[]) {
     const chat = await this.prisma.chat.findUnique({
       where: { id: chatId },
       include: { users: true } // Включаем информацию о пользователях чата
     });
     if (!chat) throw new Error("Чат не найден");
     if (!chat.isGroup) throw new Error("Нельзя добавить пользователя в direct-чат");
-    const userAlreadyInChat = chat.users.some(user => user.userId === userId);
+    const userAlreadyInChat = chat.users.some(user => user.userId in userIds);
     if (userAlreadyInChat) throw new Error("Пользователь уже находится в чате");
     return this.prisma.chat.update({
       where: { id: chatId },
       data: {
         users: {
-          create: {
+          create: userIds.map(userId => ({
             userId: userId
-          }
+          }))
         }
       }
     });
   }
 
-  async removeUserToGroupChat(chatId: number, userId: number, creatorId: number) {
+  async removeUserToGroupChat(chatId: number, userIds: number[], creatorId: number) {
     const chat = await this.prisma.chat.findUnique({
       where: { id: chatId },
       include: { users: true } // Включаем информацию о пользователях чата
@@ -91,14 +91,16 @@ export class GroupService extends ChatService {
     if (!chat) throw new NotFoundException("Чат не существует");
     if (chat.creatorId !== creatorId) throw new NotFoundException("Вы не создатель этой беседы");
     if (!chat.isGroup) throw new NotFoundException("Нельзя удалять пользователя из direct-чата");
-    const userInChat = chat.users.some(user => user.userId === userId);
+    const userInChat = chat.users.some(user => user.userId in userIds);
     if (!userInChat) throw new NotFoundException("Пользователь не находится в чате");
     try {
       // Удаляем связь пользователя с чатом
       await this.prisma.userChat.deleteMany({
         where: {
           chatId: chatId,
-          userId: userId
+          userId: {
+            in: userIds,
+          },
         }
       });
 

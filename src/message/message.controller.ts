@@ -11,7 +11,7 @@ export class MessageController {
 
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Get(":chatId")
-  async Chat(@Param("chatId") id: string) {
+  async getMessagesByChat(@Param("chatId") id: string) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.messageService.getMessagesByChat(chatId);
   }
@@ -30,6 +30,6 @@ export class MessageController {
                        @CurrentUser("id") userId: number,
                        @Query('query') query: string) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
-    return this.messageService.searchMessagesInChat(chatId, userId, query);
+    return this.messageService.searchMessages(chatId, userId, query);
   }
 }

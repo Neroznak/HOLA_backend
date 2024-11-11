@@ -10,7 +10,7 @@ export class UserController {
 
   @Auth()
   @Get("profile")
-  async getProfile(@CurrentUser("id") id: string) {
+  async getProfile(@CurrentUser("id") id: number) {
     return this.userService.getById(id);
   }
 

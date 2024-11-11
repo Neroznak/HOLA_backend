@@ -18,6 +18,7 @@ import { JWTAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { IdUsersChatDto } from "./dto/id-users-chat.dto";
 import { UpdateChatDto } from "./dto/update-chat.dto";
 import { CreateGroupChatDto } from "./dto/сreate-group.chat.dto";
+import { UpdateLastMessageDto } from "./dto/update-lastmessage.dto";
 
 
 @Controller("chats")
@@ -55,9 +56,10 @@ export class ChatController {
   @HttpCode(200)
   @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
-  @Post("create-direct")
-  async createDirectChat(@CurrentUser("id") userId: number, @Body() IdUsersChatDto: IdUsersChatDto) {
-    return this.directService.createDirectChat(userId, IdUsersChatDto.userId2);
+  @Post("create-direct/:friendId")
+  async createDirectChat(@CurrentUser("id") userId: number, @Param("friendId") frId: string) {
+    const friendId = parseInt(frId, 10); // Преобразуем id в число
+    return this.directService.createDirectChat(userId, friendId);
   }
 
   @UsePipes(new ValidationPipe())
@@ -93,7 +95,7 @@ export class ChatController {
     @Body() dto: IdUsersChatDto
   ) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
-    return this.groupService.addUserToGroupChat(chatId, dto.userId2);
+    return this.groupService.addUserToGroupChat(chatId, dto.userIds);
   }
 
   @UsePipes(new ValidationPipe())
@@ -107,7 +109,22 @@ export class ChatController {
     @CurrentUser("id") creatorId: number,
   ) {
     const chatId = parseInt(id, 10); // Преобразуем id в число
-    return this.groupService.removeUserToGroupChat(chatId, dto.userId2, creatorId);
+    return this.groupService.removeUserToGroupChat(chatId, dto.userIds, creatorId);
+  }
+
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @UseGuards(JWTAuthGuard) // Применение защитного механизма
+  @Auth()
+  @Put(":chatId/lastMessage")
+  async updateLastMessage(
+    @Param("chatId") id: string,
+    @Body() dto: UpdateLastMessageDto,
+    @CurrentUser("id") userId: number)
+  {
+    const chatId = parseInt(id, 10); // Преобразуем id в число
+    return this.chatService.updateLastMessage(chatId, userId, dto.lastMessage);
   }
 }
 

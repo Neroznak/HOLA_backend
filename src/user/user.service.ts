@@ -9,9 +9,9 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {
   }
 
-  async getById(id: string) {
+  async getById(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: { username: id }
+      where: { id: id }
 
     });
     return user;

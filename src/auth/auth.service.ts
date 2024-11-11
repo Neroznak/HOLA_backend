@@ -5,6 +5,8 @@ import { PrismaService } from "../prisma.service";
 import { Response } from "express";
 import { ConfigService } from "@nestjs/config";
 import { AuthDto } from "../user/dto/user.dto";
+import { verify } from 'argon2';
+
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,10 @@ export class AuthService {
 
   async login(dto: AuthDto) {
     const user = await this.validateUser(dto)
+    // const isValidPassword = await this.verifyPassword(dto.passwordHash, user.passwordHash);
+    // if (!isValidPassword) {
+    //   throw new UnauthorizedException('Неверный пароль');
+    // }
     const tokens = this.issueTokens(user.id)
     return { user, ...tokens}
   }
@@ -100,6 +106,11 @@ export class AuthService {
       secure: true,
       sameSite: 'none'
     })
+  }
+
+
+  async verifyPassword(enteredPassword: string, hashedPassword: string): Promise<boolean> {
+    return await verify(hashedPassword, enteredPassword);
   }
 }
 

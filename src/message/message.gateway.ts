@@ -1,4 +1,11 @@
-import { WebSocketGateway, OnGatewayInit, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  OnGatewayInit,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  WebSocketServer
+} from "@nestjs/websockets";
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { CreateMessageDto } from "./dto/create-message.dto";
@@ -17,6 +24,7 @@ import { IsReadMessageDto } from "./dto/isRead-message.dto";
 
 export class MessageGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private logger: Logger = new Logger('MyGateway');
+  @WebSocketServer() server: Server;
   private connectedClients: number = 0; // счетчик подключений
   constructor(private readonly messageService: MessageService) {} // Инъекция сервиса
 
@@ -41,6 +49,12 @@ export class MessageGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   async handleMessage(client: Socket, payload: CreateMessageDto) {
     this.logger.log(`Сообщение получено от клиента ${client.id}: ${JSON.stringify(payload)}`);
     const createdMessage = await this.messageService.createMessage(payload);
+    this.server.emit('sendMessage', {
+      id: createdMessage.id,
+      content: createdMessage.content,
+      chatId: createdMessage.chatId,
+      userId: createdMessage.userId,
+    });
     return `Message saved: ${createdMessage.id}`; // Возвращай ID сохраненного сообщения или другой ответ
   }
 
@@ -55,6 +69,8 @@ export class MessageGateway implements OnGatewayInit, OnGatewayConnection, OnGat
     await this.messageService.updateMessage(payload.messageId, payload.userId, payload.content);
     client.emit('messageRead', payload.messageId);
   }
+
+
 
 
 }

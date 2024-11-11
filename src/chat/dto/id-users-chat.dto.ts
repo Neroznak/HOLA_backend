@@ -1,7 +1,7 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsArray, IsNotEmpty } from "class-validator";
 
 export class IdUsersChatDto {
-  @IsInt()
+  @IsArray()
   @IsNotEmpty()
-  userId2: number;
+  userIds: number[];
 }
