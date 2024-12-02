@@ -1,19 +1,24 @@
 import { IsEmail, IsOptional, IsString, MinLength } from "class-validator";
 
 export class AuthDto {
-  @IsOptional()
+
   @IsString()
-  username: string;
+  phoneNumber: string;
   @IsString({
-    message: "Почта обязательна"
+    message: "Номер телефона обязательно нужно указать"
   })
+
+
   @IsEmail()
+  @IsOptional()
   email: string;
   @MinLength(6, {
     message: "Пароль должен содержать не менее 6 символов!"
   })
+
+
   @IsString({
     message: "Пароль обязателен"
   })
-  passwordHash: string;
+  password: string;
 }

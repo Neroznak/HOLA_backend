@@ -7,15 +7,18 @@ import { PrismaService } from "../../prisma.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+  // PassportStrategy — базовый класс для настройки стратегий аутентификации в @nestjs/passport.
+  // Strategy — стратегия JWT из библиотеки passport-jwt.
+  // "jwt" — уникальное имя стратегии. Его можно использовать для явного указания, что именно эта стратегия (например, в Guards).
   constructor(
     private configService: ConfigService,
     private userService: UserService,
     private prisma: PrismaService
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: true,
-      secretOrKey: configService.get("JWT_SECRET")
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Указывает, что JWT-токен будет извлекаться из заголовка Authorization в формате Bearer <token>.
+      ignoreExpiration: true, // Указывает, что токен может быть использован, даже если его срок действия истёк.
+      secretOrKey: configService.get("JWT_SECRET") // Указывает секретный ключ для проверки подписи JWT. Этот ключ должен совпадать с тем, который использовался для генерации токена.
     });
   }
 

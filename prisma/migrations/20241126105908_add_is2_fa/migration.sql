@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "is2Fa" BOOLEAN NOT NULL DEFAULT false;

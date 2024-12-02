@@ -3,9 +3,8 @@ import {
   Controller,
   Get,
   HttpCode,
-  Param, Patch,
+  Param, ParseIntPipe, Patch,
   Post, Put,
-  UseGuards,
   UsePipes,
   ValidationPipe
 } from "@nestjs/common";
@@ -14,7 +13,6 @@ import { Auth } from "../auth/decorators/auth.decorator";
 import { CurrentUser } from "../auth/decorators/user.decorator";
 import { DirectService } from "./direct-chat.service";
 import { GroupService } from "./group-chat.service";
-import { JWTAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { IdUsersChatDto } from "./dto/id-users-chat.dto";
 import { UpdateChatDto } from "./dto/update-chat.dto";
 import { CreateGroupChatDto } from "./dto/сreate-group.chat.dto";
@@ -30,14 +28,12 @@ export class ChatController {
 
   @Auth()
   @Get("by-id/:chatId")
-  async getById(@Param("chatId") id: string,
+  async getById(@Param("chatId", ParseIntPipe) chatId: number,
                 @CurrentUser("id") userId: number) {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.chatService.getChatById(chatId, userId);
   }
 
   @Auth()
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Get("")
   async getChatsByUser(@CurrentUser("id") userId: number) {
     return this.chatService.getChatsByUser(userId);
@@ -45,85 +41,70 @@ export class ChatController {
 
   @HttpCode(200)
   @Auth()
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Patch(":chatId/delete")
-  async delete(@Param("chatId") id: string, @CurrentUser("id") userId: number) {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
+  async delete(@Param("chatId", ParseIntPipe) chatId: number, @CurrentUser("id") userId: number) {
     return this.chatService.delete(chatId, userId);
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Post("create-direct/:friendId")
-  async createDirectChat(@CurrentUser("id") userId: number, @Param("friendId") frId: string) {
-    const friendId = parseInt(frId, 10); // Преобразуем id в число
+  async createDirectChat(@CurrentUser("id") userId: number, @Param("friendId", ParseIntPipe) friendId: number) {
     return this.directService.createDirectChat(userId, friendId);
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Post("create-group")
-  async createGroupChat(@Body() createGroupChatDto: CreateGroupChatDto, @CurrentUser("id") creatorId:number) {
+  async createGroupChat(@Body() createGroupChatDto: CreateGroupChatDto, @CurrentUser("id") creatorId: number) {
     return this.groupService.createGroupChat(createGroupChatDto, creatorId);
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Put(":chatId")
   async update(
-    @Param("chatId") id: string,
+    @Param("chatId", ParseIntPipe) chatId: number,
     @Body() dto: UpdateChatDto,
-    @CurrentUser("id") userId: number)
- {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
+    @CurrentUser("id") userId: number) {
     return this.groupService.updateGroupChat(chatId, dto, userId);
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Patch(":chatId/add")
   async addUserToChat(
-    @Param("chatId") id: string,
+    @Param("chatId", ParseIntPipe) chatId: number,
     @Body() dto: IdUsersChatDto
   ) {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.groupService.addUserToGroupChat(chatId, dto.userIds);
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Patch(":chatId/remove")
   async removeUserToChat(
-    @Param("chatId") id: string,
+    @Param("chatId", ParseIntPipe) chatId: number,
     @Body() dto: IdUsersChatDto,
-    @CurrentUser("id") creatorId: number,
+    @CurrentUser("id") creatorId: number
   ) {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
     return this.groupService.removeUserToGroupChat(chatId, dto.userIds, creatorId);
   }
 
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @UseGuards(JWTAuthGuard) // Применение защитного механизма
   @Auth()
   @Put(":chatId/lastMessage")
   async updateLastMessage(
-    @Param("chatId") id: string,
+    @Param("chatId", ParseIntPipe) chatId: number,
     @Body() dto: UpdateLastMessageDto,
-    @CurrentUser("id") userId: number)
-  {
-    const chatId = parseInt(id, 10); // Преобразуем id в число
+    @CurrentUser("id") userId: number) {
     return this.chatService.updateLastMessage(chatId, userId, dto.lastMessage);
   }
 }

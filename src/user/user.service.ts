@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { hash } from "argon2";
-import { AuthDto } from "./dto/user.dto";
+import { AuthDto } from "../auth/dto/auth.dto";
+import { MailDto } from "../auth/dto/mail.dto";
 
 
 @Injectable()
@@ -24,13 +25,67 @@ export class UserService {
     return user;
   }
 
+  async getByPhoneNumber(phoneNumber: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { phoneNumber: phoneNumber }
+    });
+    return user;
+  }
+
 
   async create(dto: AuthDto) {
     return this.prisma.user.create({
       data: {
-        username: dto.username,
+        phoneNumber: dto.phoneNumber,
         email: dto.email,
-        passwordHash: await hash(dto.passwordHash)
+        password: await hash(dto.password)
+      }
+    });
+  }
+
+
+
+  async addEmail(phoneNumber: string, mail: MailDto) {
+    const {email } = mail;
+    return this.prisma.user.update({
+      where: {
+        phoneNumber: phoneNumber
+      },
+      data: {
+        email: email
+      }
+    });
+  }
+
+  async resetPassword (phoneNumber: string) {
+    return this.prisma.user.update({
+      where: {
+        phoneNumber: phoneNumber
+      },
+      data: {
+        password: null
+      }
+    });
+  }
+
+  async changePassword (phoneNumber: string, password:string) {
+    return this.prisma.user.update({
+      where: {
+        phoneNumber: phoneNumber
+      },
+      data: {
+        password: password
+      }
+    });
+  }
+
+  async changeIs2Fa (phoneNumber: string) {
+    return this.prisma.user.update({
+      where: {
+        phoneNumber: phoneNumber
+      },
+      data: {
+        is2Fa: true
       }
     });
   }
