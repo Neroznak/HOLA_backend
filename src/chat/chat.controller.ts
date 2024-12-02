@@ -30,7 +30,7 @@ export class ChatController {
   @Get("by-id/:chatId")
   async getById(@Param("chatId", ParseIntPipe) chatId: number,
                 @CurrentUser("id") userId: number) {
-    return this.chatService.getChatById(chatId, userId);
+    return this.chatService.getChatById(chatId, userId); // тест чтобы проверить как бы.. вот
   }
 
   @Auth()
