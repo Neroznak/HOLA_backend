@@ -82,21 +82,17 @@ model Attachment {
 }
 
 model Session {
-  sid         String   @id // Идентификатор сессии (sid)
+  sid         String   @id @default(uuid()) // Генерация UUID
   createdAt   DateTime @default(now()) // Время создания сессии
   updated     DateTime @default(now()) // Время последнего обновления сессии
   device_name String // Название устройства
   ip_adress   String // IP-адрес устройства
   location    String? // Локация (необязательное поле)
   last_active DateTime // Время последней активности
-  is_active   Boolean  @default(true) // Статус активности сессии
   device_type String // Тип устройства
 
   user    User @relation(fields: [user_id], references: [id]) // Связь с пользователем
   user_id Int // Идентификатор пользователя
-
-  expire DateTime // Время истечения сессии
-  sess   Json // Данные сессии в формате JSON
 
   @@map("session") // Указываем имя таблицы
 }

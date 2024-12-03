@@ -1,4 +1,3 @@
-
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { MailAuthService } from "./mail.service";
@@ -13,12 +12,7 @@ import { PrismaService } from "../prisma.service";
 import { UserService } from "../user/user.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { PhoneAuthService } from "./phone.service";
-// import { Pool } from 'pg';
-// import { SessionService } from "./session/session.service";
-// import { SessionModule } from "./session/session.module";
-
-
-
+import { SessionService } from "./session/session.service";
 
 
 @Module({
@@ -35,17 +29,9 @@ import { PhoneAuthService } from "./phone.service";
   ],
   controllers: [AuthController],
   exports: [JWTAuthGuard],
-  providers: [AuthService, PrismaService, UserService, JwtStrategy, JWTAuthGuard, PhoneAuthService, MailAuthService]
+  providers: [AuthService, PrismaService, UserService, JwtStrategy, JWTAuthGuard, PhoneAuthService, MailAuthService, SessionService]
 })
-// {
-//   provide: 'PG_POOL',
-//   useFactory: () => {
-//     return new Pool({
-//       connectionString: process.env.DATABASE_URL,
-//     });
-//   },
-// }],
-// })
+
 
 export class AuthModule {
 };

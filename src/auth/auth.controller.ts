@@ -16,7 +16,7 @@ import { PhoneAuthService } from "./phone.service";
 import { MailAuthService } from "./mail.service";
 import { PhoneDto } from "./dto/phone.dto";
 import { MailDto } from "./dto/mail.dto";
-// import { SessionService } from "./session/session.service";
+import { SessionService } from "./session/session.service";
 import { UserService } from "../user/user.service";
 
 @Controller("auth")
@@ -24,7 +24,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly phoneAuthService: PhoneAuthService,
               private readonly mailAuthService: MailAuthService,
-              // private readonly sessionService: SessionService,
+              private readonly sessionService: SessionService,
               private readonly userService: UserService
   ) {
   }
@@ -38,15 +38,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const { refreshToken, ...response } = await this.authService.login(dto);
-    // const user = await this.userService.getByPhoneNumber(dto.phoneNumber);
-    // const oldSession = await this.sessionService.getActiveSession(user.id, req.headers["user-agent"], req.ip);
-    // if (!oldSession) {
-    //   await this.sessionService.createSession(req.session, req.headers["user-agent"], req.ip, user.id);
-    // } else {
-    //   await this.sessionService.upgradeSession(oldSession);
-    // }
+    const user = await this.userService.getByPhoneNumber(dto.phoneNumber);
+    await this.sessionService.upsertSession(user.id, req.headers["user-agent"], req.ip);
     this.authService.addRefreshTokenToResponse(res, refreshToken);
-
     return response;
   }
 
