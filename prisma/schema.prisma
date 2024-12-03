@@ -91,8 +91,8 @@ model Session {
   last_active DateTime // Время последней активности
   device_type String // Тип устройства
 
-  user    User @relation(fields: [user_id], references: [id]) // Связь с пользователем
-  user_id Int // Идентификатор пользователя
+  user    User? @relation(fields: [user_id], references: [id]) // Связь с пользователем (необязательная)
+  user_id Int? // Идентификатор пользователя (необязательный)
 
   @@map("session") // Указываем имя таблицы
 }

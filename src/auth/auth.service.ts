@@ -5,8 +5,8 @@ import { Response } from "express";
 import { ConfigService } from "@nestjs/config";
 import { AuthDto } from "./dto/auth.dto";
 import { verify } from "argon2";
-
-
+import { PrismaService } from "../prisma.service";
+import * as QRCode from "qrcode";
 
 
 @Injectable()
@@ -16,7 +16,8 @@ export class AuthService {
 
   constructor(private jwt: JwtService,
               private userService: UserService,
-              private configService: ConfigService) {
+              private configService: ConfigService,
+              private prisma: PrismaService) {
   }
 
   async login(dto: AuthDto) { // наверное сюда стоит добавить проверку в cookie токена
@@ -98,7 +99,17 @@ export class AuthService {
   }
 
 
-
+  // Кнопка, которая проверяет отсканировали ли уже QR код. Если да - авторизируй пользователя.
+  async checkByQr(sid: string) {
+    const session = await this.prisma.session.findUnique({
+      where:
+        { sid: sid }
+    });
+    if (!session) throw new NotFoundException("Ваш QR код ещё не отсканирован");
+    const user = await this.userService.getById(session.user_id);
+    const tokens = this.issueTokens(session.user_id);
+    return { user, ...tokens };
+  }
 
 
 }

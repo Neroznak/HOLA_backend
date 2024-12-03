@@ -2,13 +2,17 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import * as useragent from "useragent";
 import * as geoip from "geoip-lite";
 import { PrismaService } from "../../prisma.service";
+import * as QRCode from "qrcode";
+import { v4 as uuidv4 } from 'uuid';
+import { User } from "@prisma/client";
+
 
 @Injectable()
 export class SessionService {
   constructor(private readonly prisma: PrismaService) {
   }
 
-  async createSession(userAgent: string, ip: string, userId: number) {
+  async createSession(userAgent: string, ip: string, userId?: number) {
     const agent = useragent.parse(userAgent);
     const geo = geoip.lookup(ip);
     const location = geo?.city || "Unknown Location"; // Если geo или geo.city null, будет использоваться "Unknown Location"
@@ -20,7 +24,7 @@ export class SessionService {
           location: location,
           last_active: new Date(),
           device_type: agent.os.family || "Unknown OS",
-          user_id: userId
+          user_id: userId || null
         }
       });
     } catch (error) {
@@ -40,6 +44,17 @@ export class SessionService {
     });
   }
 
+  async addUserToSession(sid: string, userId: number) {
+    return this.prisma.session.update({
+      where: {
+        sid: sid
+      },
+      data: {
+        user_id: userId
+      }
+    });
+  }
+
 
   async upsertSession(userId: number, userAgent: string, ip: string) {
     const agent = useragent.parse(userAgent);
@@ -53,11 +68,12 @@ export class SessionService {
     });
     if (activeSession.length === 0) {
       return this.createSession(userAgent, ip, userId);
-    }
-    else
-    {
+    } else {
       return this.upgradeSession(activeSession[0].sid);
     }
   }
+
+
+
 
 }

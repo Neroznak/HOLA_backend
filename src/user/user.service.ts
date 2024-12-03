@@ -25,6 +25,8 @@ export class UserService {
     return user;
   }
 
+
+
   async getByPhoneNumber(phoneNumber: string) {
     const user = await this.prisma.user.findUnique({
       where: { phoneNumber: phoneNumber }
